@@ -67,7 +67,7 @@ def main():
     if args.action == "upload":
         if args.datadir_path is None or args.client_secrets_path is None:
             parser.error(
-                "Action: 'download' requires --client-secrets-path and "
+                "Action: 'upload' requires --client-secrets-path and "
                 "--datadir-path specified."
             )
 
