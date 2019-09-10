@@ -3,12 +3,11 @@ import warnings
 
 from pathlib import Path
 
-from paralytics import NothingSelectedWarning
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
 
-def upload(client_secrets_path, files_paths=None,
+def upload(client_secrets_path, files_paths, folder_id="root",
            credentials_path=None, save_credentials=False):
     """Uploads specified files to Google Drive."""
     client_secrets_path = Path(client_secrets_path).resolve()
@@ -50,19 +49,19 @@ def upload(client_secrets_path, files_paths=None,
 
     drive = GoogleDrive(gauth)
 
-    if files_paths is None:
-        files_paths = []
-        warnings.warn(
-            "No file has been selected for uploading to Google Drive.",
-            NothingSelectedWarning
-        )
-
     for file_path in files_paths:
         file_path = Path(file_path).resolve()
-        file = drive.CreateFile({"title": os.path.split(file_path)[-1]})
+        file = drive.CreateFile({
+            "title": os.path.split(file_path)[-1],
+            "parents": [{
+                "id": folder_id,
+                "kind": "drive#file"
+            }]
+        })
         file.SetContentFile(str(file_path))
         file.Upload()
         print(
-            "The file: {} of mimeType: {} was succesfully uploaded."
-            .format(file["title"], file["mimeType"])
+            "The file: {} of mimeType: {} was succesfully uploaded to "
+            "the folder of id: {}."
+            .format(file["title"], file["mimeType"], folder_id)
         )
